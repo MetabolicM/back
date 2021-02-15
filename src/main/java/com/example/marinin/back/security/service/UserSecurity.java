@@ -28,7 +28,7 @@ public class UserSecurity implements UserDetailsService {
     @Transactional
     public User loadUserByUsername(String userName) throws UsernameNotFoundException {
         Optional<User> userOptional = userDAO.loadUserByUsername(userName);
-        if (userOptional.isPresent()){
+        if (userOptional.isPresent()) {
             return userOptional.get();
         }
         throw new UsernameNotFoundException("User not found by name: " + userName);
