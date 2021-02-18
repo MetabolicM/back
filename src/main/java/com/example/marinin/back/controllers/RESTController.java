@@ -30,6 +30,7 @@ public class RESTController {
     }
 
     @GetMapping("/rest/current")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
     public ResponseEntity<User> getCurrent() {
         return new ResponseEntity<>((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal(), HttpStatus.OK);
     }
@@ -47,18 +48,21 @@ public class RESTController {
     }
 
     @PostMapping("/rest")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<User>> newUser(@RequestBody User user) {
         userService.save(user);
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
     @DeleteMapping("/rest/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<User>> delete(@PathVariable("id") int id) {
         userService.delete(id);
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
     @PatchMapping("rest/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<User>> edit(@RequestBody User user) {
         userService.update(user);
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);

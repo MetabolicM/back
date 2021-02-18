@@ -37,8 +37,14 @@ public class AuthController {
     @CrossOrigin(origins = {"http://localhost:8080"}, maxAge = 4800, allowCredentials = "true")
     @PostMapping
     public ResponseEntity<LoginResponse> authenticateUser(@RequestBody LoginRequest login) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()));
+
+        Authentication authentication;
+        try{
+             authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()));
+        }catch (Exception e){
+            return new ResponseEntity<>(new LoginResponse(null, null), HttpStatus.UNAUTHORIZED);
+        }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
@@ -56,23 +62,5 @@ public class AuthController {
         }
 
         return new ResponseEntity<>(new LoginResponse(jwt, accessType), HttpStatus.OK);
-    }
-
-    @GetMapping("/access")
-    public ResponseEntity<String> getAccess() {
-        String access = null;
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Set<Role> setRole = user.getRoles();
-
-        for (Role role : setRole) {
-            if (role.getRole().equals("ROLE_ADMIN")) {
-                access = "admin";
-                break;
-            }
-            access = "user";
-        }
-
-        ResponseEntity<String> responseEntity = new ResponseEntity<>(access, HttpStatus.OK);
-        return responseEntity;
     }
 }
